@@ -1,0 +1,30 @@
+{
+  "name": "zip-me",
+  "version": "1.0.0",
+  "description": "Zip Me Lab",
+  "main": "index.js",
+  "repository": "https://github.com/JimBeam2019/zip-me.git",
+  "author": "J.L.",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "babel-watch index.js"
+  },
+  "dependencies": {
+    "@babel/core": "^7.12.13",
+    "express": "^4.17.1",
+    "winston": "^3.3.3",
+    "winston-daily-rotate-file": "^4.5.0"
+  },
+  "devDependencies": {
+    "babel-watch": "^7.4.0",
+    "eslint": "^7.19.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^7.2.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-prefer-arrow": "^1.2.3",
+    "eslint-plugin-prettier": "^3.3.1",
+    "eslint-plugin-promise": "^4.3.1",
+    "prettier": "^2.2.1"
+  }
+}
