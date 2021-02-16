@@ -15,7 +15,7 @@ class RandChar {
   static getRandStr(length) {
     return Math.random()
       .toString(36)
-      .replace(/[^a-z]+/g, "")
+      .replace(/[^a-z]+/g, '')
       .substr(0, length);
   }
 
@@ -31,7 +31,7 @@ class RandChar {
     return Number(
       Math.random()
         .toString(36)
-        .replace(/[^0-9]+/g, "")
+        .replace(/[^0-9]+/g, '')
         .substr(0, length)
     );
   }

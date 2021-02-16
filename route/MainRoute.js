@@ -1,8 +1,8 @@
-const express = require("express");
+const express = require('express');
 
-const logger = require("../config/logger");
-const RandChar = require("../model/RandChar");
-const ZlibModel = require("../model/ZlibModel");
+const logger = require('../config/logger');
+const ZlibModel = require('../model/ZlibModel');
+const RandDataGenerator = require('../control/RandDataGeneratorEvent');
 
 /**
  *
@@ -29,34 +29,46 @@ class MainRoute {
    */
   runApp() {
     // http://localhost:4200/
-    this.route.get("/", async (req, res) => {
-      res.status(200).send({ code: 200, message: "Welcome mate." });
+    this.route.get('/', async (req, res) => {
+      res.status(200).send({ code: 200, message: 'Welcome mate.' });
     });
   }
 
+  /**
+   *
+   *
+   * @memberof MainRoute
+   */
   runRand() {
     // http://localhost:4200/rand
-    this.route.get("/rand", async (req, res) => {
-      const randStr = RandChar.getRandStr(9);
+    this.route.get('/rand', (req, res) => {
+      const dataGenerator = new RandDataGenerator();
 
-      const randNum = RandChar.getRandNum(9);
+      const result = dataGenerator.batchCreateOjb(1000, 15);
 
-      res.status(200).send({ code: 200, message: { randStr, randNum } });
+      dataGenerator.clearAllEvents();
+
+      res.status(200).send({ code: 200, result });
     });
   }
 
+  /**
+   *
+   *
+   * @memberof MainRoute
+   */
   runZip() {
     // http://localhost:4200/zip
-    this.route.get("/zip", async (req, res) => {
+    this.route.get('/zip', async (req, res) => {
       const zlib = new ZlibModel();
 
-      const rawStr = "Hello zip zap zop - 123456789";
+      const rawStr = 'Hello zip zap zop - 123456789';
       const result = await zlib.zip(rawStr);
       const original = await zlib.unzip(result);
 
-      logger.debug("Unzip:", { original });
+      logger.debug('Unzip:', { original });
 
-      res.status(200).send({ code: 200, message: "Zip Done", result });
+      res.status(200).send({ code: 200, message: 'Zip Done', result });
     });
   }
 }
