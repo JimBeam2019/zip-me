@@ -44,7 +44,7 @@ class MainRoute {
     this.route.get('/rand', (req, res) => {
       const dataGenerator = new RandDataGenerator();
 
-      const result = dataGenerator.batchCreateOjb(1000, 15);
+      const result = dataGenerator.createCsv(1000, 15);
 
       dataGenerator.clearAllEvents();
 
@@ -69,6 +69,30 @@ class MainRoute {
       logger.debug('Unzip:', { original });
 
       res.status(200).send({ code: 200, message: 'Zip Done', result });
+    });
+
+    // http://localhost:4200/zip-csv
+    this.route.get('/zip-csv', (req, res) => {
+      const dataGenerator = new RandDataGenerator();
+
+      const result = dataGenerator.zipCsv('VictoriaD_BenPlanDeps_12082020.csv');
+
+      dataGenerator.clearAllEvents();
+
+      res.status(200).send({ code: 200, result });
+    });
+
+    // http://localhost:4200/zip-csv-raw
+    this.route.get('/zip-csv-raw', (req, res) => {
+      const dataGenerator = new RandDataGenerator();
+
+      const result = dataGenerator.zipCsvRaw(
+        'VictoriaD_BenPlanDeps_12082020.csv'
+      );
+
+      dataGenerator.clearAllEvents();
+
+      res.status(200).send({ code: 200, result });
     });
   }
 }
