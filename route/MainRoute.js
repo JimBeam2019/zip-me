@@ -2,7 +2,8 @@ const express = require('express');
 
 const logger = require('../config/logger');
 const ZlibModel = require('../model/ZlibModel');
-const RandDataGenerator = require('../control/RandDataGeneratorEvent');
+const CsvDataController = require('../controller/CsvDataController');
+const RandDataController = require('../controller/RandDataController');
 
 /**
  *
@@ -42,11 +43,22 @@ class MainRoute {
   runRand() {
     // http://localhost:4200/rand
     this.route.get('/rand', (req, res) => {
-      const dataGenerator = new RandDataGenerator();
+      const dataGenerator = new RandDataController();
 
-      const result = dataGenerator.batchCreateOjb(1000, 15);
+      const result = dataGenerator.createCsv(1000, 15);
 
       dataGenerator.clearAllEvents();
+
+      res.status(200).send({ code: 200, result });
+    });
+
+    // http://localhost:4200/more/data/:filename
+    this.route.get('/more/data/:filename', (req, res) => {
+      const csvDataController = new CsvDataController();
+
+      const result = csvDataController.multipleCsvData(req.params.filename);
+
+      csvDataController.clearAllEvents();
 
       res.status(200).send({ code: 200, result });
     });
@@ -69,6 +81,28 @@ class MainRoute {
       logger.debug('Unzip:', { original });
 
       res.status(200).send({ code: 200, message: 'Zip Done', result });
+    });
+
+    // http://localhost:4200/zip-csv/:filename
+    this.route.get('/zip-csv/:filename', (req, res) => {
+      const dataGenerator = new RandDataController();
+
+      const result = dataGenerator.zipCsv(req.params.filename);
+
+      dataGenerator.clearAllEvents();
+
+      res.status(200).send({ code: 200, result });
+    });
+
+    // http://localhost:4200/zip-csv-raw/:filename
+    this.route.get('/zip-csv-raw/:filename', (req, res) => {
+      const dataGenerator = new RandDataController();
+
+      const result = dataGenerator.zipCsvRaw(req.params.filename);
+
+      dataGenerator.clearAllEvents();
+
+      res.status(200).send({ code: 200, result });
     });
   }
 }

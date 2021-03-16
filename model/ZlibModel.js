@@ -1,4 +1,4 @@
-const zlib = require("zlib");
+const zlib = require('zlib');
 
 /**
  *
@@ -10,17 +10,17 @@ class ZlibModel {
    *
    *
    * @param {string} plainData
-   * @returns
+   * @return {Promise}
    * @memberof ZlibModel
    */
   async zip(plainData) {
     return new Promise((resolve, reject) => {
       zlib.deflate(plainData, (err, buffer) => {
         if (err) {
-          reject(new Error("Error: Zlib deflate in compression."));
+          reject(new Error('Error: Zlib deflate in compression.'));
         }
 
-        resolve(buffer.toString("base64"));
+        resolve(buffer.toString('base64'));
       });
     });
   }
@@ -29,16 +29,16 @@ class ZlibModel {
    *
    *
    * @param {string} cryptoData
-   * @returns
+   * @return {Promise}
    * @memberof ZlibModel
    */
   async unzip(cryptoData) {
-    const bufferData = Buffer.from(cryptoData, "base64");
+    const bufferData = Buffer.from(cryptoData, 'base64');
 
     return new Promise((resolve, reject) => {
       zlib.unzip(bufferData, (err, buffer) => {
         if (err) {
-          reject(new Error("Error: Zlib unzip in compression."));
+          reject(new Error('Error: Zlib unzip in compression.'));
         }
 
         resolve(buffer.toString());
