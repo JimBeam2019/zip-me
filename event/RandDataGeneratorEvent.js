@@ -24,6 +24,11 @@ class RandDataGeneratorEvent extends EventEmitter {
   constructor() {
     super();
 
+    this.CREATE_CSV = 'createCsv';
+    this.ZIP_CSV = 'zipCsv';
+    this.ZIP_CSV_RAW = 'zipCsvRaw';
+    this.ERROR = 'errorRandData';
+
     this.createCsvEvent();
     this.zipCsvEvent();
     this.zipCsvRawEvent();
@@ -33,30 +38,10 @@ class RandDataGeneratorEvent extends EventEmitter {
   /**
    *
    *
-   * @param {number} rowNum
-   * @param {number} colNum
-   * @return {string}
-   * @memberof RandDataGeneratorEvent
-   */
-  createCsv(rowNum, colNum) {
-    if (rowNum > 0 && colNum > 0) {
-      this.emit('createCsv', rowNum, colNum);
-      return 'Json file is located in the file directory.';
-    }
-
-    const errMsg = 'The number of row or column must be greater than zero.';
-
-    this.emit('error', new Error(errMsg));
-    return errMsg;
-  }
-
-  /**
-   *
-   *
    * @memberof RandDataGeneratorEvent
    */
   createCsvEvent() {
-    this.on('createCsv', (rowNum, colNum) => {
+    this.on(this.CREATE_CSV, (rowNum, colNum) => {
       const colHeader = [];
       const result = [];
 
@@ -98,20 +83,11 @@ class RandDataGeneratorEvent extends EventEmitter {
   /**
    *
    *
-   * @param {string} filename
    * @return {string}
    * @memberof RandDataGeneratorEvent
    */
-  zipCsv(filename) {
-    if (!isEmpty(filename)) {
-      this.emit('zipCsv', filename);
-      return 'secret file is already generated.';
-    }
-
-    const errMsg = 'The filename is empty.';
-
-    this.emit('error', new Error(errMsg));
-    return errMsg;
+  getCreateCsvEventName() {
+    return this.CREATE_CSV;
   }
 
   /**
@@ -120,7 +96,7 @@ class RandDataGeneratorEvent extends EventEmitter {
    * @memberof RandDataGeneratorEvent
    */
   zipCsvEvent() {
-    this.on('zipCsv', async (filename) => {
+    this.on(this.ZIP_CSV, async (filename) => {
       const dirPath = path.join(process.cwd(), '/file');
 
       const fileContent = await fs.readFileSync(`${dirPath}/${filename}`);
@@ -164,20 +140,11 @@ class RandDataGeneratorEvent extends EventEmitter {
   /**
    *
    *
-   * @param {string} filename
    * @return {string}
    * @memberof RandDataGeneratorEvent
    */
-  zipCsvRaw(filename) {
-    if (!isEmpty(filename)) {
-      this.emit('zipCsvRaw', filename);
-      return 'Raw secret file is already generated.';
-    }
-
-    const errMsg = 'The filename is empty.';
-
-    this.emit('error', new Error(errMsg));
-    return errMsg;
+  getZipCsvEventName() {
+    return this.ZIP_CSV;
   }
 
   /**
@@ -186,7 +153,7 @@ class RandDataGeneratorEvent extends EventEmitter {
    * @memberof RandDataGeneratorEvent
    */
   zipCsvRawEvent() {
-    this.on('zipCsvRaw', async (filename) => {
+    this.on(this.ZIP_CSV_RAW, async (filename) => {
       const dirPath = path.join(process.cwd(), '/file');
 
       const fileContent = await fs.readFileSync(
@@ -201,9 +168,6 @@ class RandDataGeneratorEvent extends EventEmitter {
       stringify(secretLines, { header: true }, (err, output) => {
         fs.writeFileSync(`${dirPath}/secret-raw-sample.csv`, output);
       });
-      // lines.forEach((line) => {
-      //   logger.debug('Line:', { line });
-      // });
     });
   }
 
@@ -228,6 +192,16 @@ class RandDataGeneratorEvent extends EventEmitter {
     return secretRecords;
   }
 
+  /**
+   *
+   *
+   * @return {string}
+   * @memberof RandDataGeneratorEvent
+   */
+  getZipCsvRawEventName() {
+    return this.ZIP_CSV_RAW;
+  }
+
   // async compareZipCsvEvent() {
   //   this.on('compareZipCsv', async (file1, file2) => {
   //     const dirPath = path.join(process.cwd(), '/file');
@@ -245,7 +219,7 @@ class RandDataGeneratorEvent extends EventEmitter {
    * @memberof RandDataGeneratorEvent
    */
   errorEvent() {
-    this.on('error', (error) => {
+    this.on(this.ERROR, (error) => {
       logger.error(`Gracefully handling our error: ${error}`);
     });
   }
@@ -253,12 +227,11 @@ class RandDataGeneratorEvent extends EventEmitter {
   /**
    *
    *
+   * @return {string}
    * @memberof RandDataGeneratorEvent
    */
-  clearAllEvents() {
-    this.removeAllListeners('createCsv');
-    this.removeAllListeners('zipCsv');
-    this.removeAllListeners('error');
+  getErrorEventName() {
+    return this.ERROR;
   }
 }
 
