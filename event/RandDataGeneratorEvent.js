@@ -1,14 +1,9 @@
 const EventEmitter = require('events');
-const fs = require('fs');
-// const Hashids = require('hashids/cjs');
-const path = require('path');
-const { isEmpty } = require('lodash');
-const stringify = require('csv-stringify');
 const parse = require('csv-parse/lib/sync');
 
 const logger = require('../config/logger');
 const RandChar = require('../model/RandChar');
-const ZlibModel = require('../model/ZlibModel');
+const DataHelper = require('../helper/DataHelper');
 
 /**
  *
@@ -23,6 +18,8 @@ class RandDataGeneratorEvent extends EventEmitter {
    */
   constructor() {
     super();
+
+    this.dataHelper = new DataHelper();
 
     this.CREATE_CSV = 'createCsv';
     this.ZIP_CSV = 'zipCsv';
@@ -41,7 +38,7 @@ class RandDataGeneratorEvent extends EventEmitter {
    * @memberof RandDataGeneratorEvent
    */
   createCsvEvent() {
-    this.on(this.CREATE_CSV, (rowNum, colNum) => {
+    this.on(this.CREATE_CSV, async (rowNum, colNum) => {
       const colHeader = [];
       const result = [];
 
@@ -72,11 +69,7 @@ class RandDataGeneratorEvent extends EventEmitter {
         result.push(obj);
       }
 
-      stringify(result, { header: true }, (err, output) => {
-        const dirPath = path.join(process.cwd(), '/file');
-
-        fs.writeFileSync(`${dirPath}/data.csv`, output);
-      });
+      await this.dataHelper.writeCsvFile(result, 'data.csv');
     });
   }
 
@@ -97,44 +90,14 @@ class RandDataGeneratorEvent extends EventEmitter {
    */
   zipCsvEvent() {
     this.on(this.ZIP_CSV, async (filename) => {
-      const dirPath = path.join(process.cwd(), '/file');
-
-      const fileContent = await fs.readFileSync(`${dirPath}/${filename}`);
+      const fileContent = await this.dataHelper.readFile(filename);
 
       const records = parse(fileContent, { columns: true, trim: true });
 
-      const secretRecords = await this.reformateRecords(records);
+      const secretRecords = await this.dataHelper.reformateRecords(records);
 
-      stringify(secretRecords, { header: true }, (err, output) => {
-        fs.writeFileSync(`${dirPath}/secret2-sample.csv`, output);
-      });
+      await this.dataHelper.writeCsvFile(secretRecords, 'secret2-sample.csv');
     });
-  }
-
-  /**
-   *
-   *
-   * @param {array} records
-   * @return {array}
-   * @memberof RandDataGeneratorEvent
-   */
-  async reformateRecords(records) {
-    const zlib = new ZlibModel();
-    // const hashids = new Hashids('', 10);
-
-    const secretRecords = await Promise.all(
-      records.map(async (record) => {
-        const body = await zlib.zip(JSON.stringify(record));
-
-        // const datetime = new Date(Date.now());
-        // const createdDate = datetime.toUTCString();
-        // const uuid = hashids.encode(Number(datetime));
-
-        return { body };
-      })
-    );
-
-    return secretRecords;
   }
 
   /**
@@ -154,42 +117,14 @@ class RandDataGeneratorEvent extends EventEmitter {
    */
   zipCsvRawEvent() {
     this.on(this.ZIP_CSV_RAW, async (filename) => {
-      const dirPath = path.join(process.cwd(), '/file');
-
-      const fileContent = await fs.readFileSync(
-        `${dirPath}/${filename}`,
-        'UTF-8'
-      );
+      const fileContent = await this.dataHelper.readFile(filename);
 
       const lines = fileContent.split(/\r?\n/);
 
-      const secretLines = await this.zipLines(lines);
+      const secretLines = await this.dataHelper.zipLines(lines);
 
-      stringify(secretLines, { header: true }, (err, output) => {
-        fs.writeFileSync(`${dirPath}/secret-raw-sample.csv`, output);
-      });
+      await this.dataHelper.writeCsvFile(secretLines, 'secret-raw-sample.csv');
     });
-  }
-
-  /**
-   *
-   *
-   * @param {array} lines
-   * @return {array}
-   * @memberof RandDataGeneratorEvent
-   */
-  async zipLines(lines) {
-    const zlib = new ZlibModel();
-
-    const secretRecords = await Promise.all(
-      lines.map(async (line) => {
-        const body = isEmpty(line) ? '' : await zlib.zip(line);
-
-        return { body };
-      })
-    );
-
-    return secretRecords;
   }
 
   /**
@@ -201,17 +136,6 @@ class RandDataGeneratorEvent extends EventEmitter {
   getZipCsvRawEventName() {
     return this.ZIP_CSV_RAW;
   }
-
-  // async compareZipCsvEvent() {
-  //   this.on('compareZipCsv', async (file1, file2) => {
-  //     const dirPath = path.join(process.cwd(), '/file');
-
-  //     const fileContent1 = await fs.readFileSync(`${dirPath}/${file1}`);
-  //     const fileContent2 = await fs.readFileSync(`${dirPath}/${file2}`);
-
-  //     // const records1 = parse(fileContent1, {col})
-  //   });
-  // }
 
   /**
    *

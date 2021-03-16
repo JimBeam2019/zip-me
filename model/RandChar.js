@@ -35,6 +35,18 @@ class RandChar {
         .substr(0, length)
     );
   }
+
+  /**
+   *
+   *
+   * @static
+   * @param {number} max
+   * @return {number}
+   * @memberof RandChar
+   */
+  static getRandomInt(max) {
+    return Math.floor(Math.random() * Math.floor(max));
+  }
 }
 
 module.exports = RandChar;

@@ -1,10 +1,8 @@
 const EventEmitter = require('events');
-const fs = require('fs');
-const path = require('path');
-const stringify = require('csv-stringify');
 const parse = require('csv-parse/lib/sync');
 
 const logger = require('../config/logger');
+const DataHelper = require('../helper/DataHelper');
 const RandChar = require('../model/RandChar');
 
 /**
@@ -35,13 +33,23 @@ class CsvDataGeneratorEvent extends EventEmitter {
    */
   multipleCsvDataEvent() {
     this.on(this.MULTIPLE_CSV_DATA, async (filename) => {
-      const dirPath = path.join(process.cwd(), '/file');
-
-      const fileContent = await fs.readFileSync(`${dirPath}/${filename}`);
+      const dataHelper = new DataHelper();
+      const fileContent = await dataHelper.readFile(filename);
 
       const records = parse(fileContent, { columns: true, trim: true });
+      const newRecords = [];
 
-      logger.info('CSV', { records });
+      for (let index = 0; index < 1000; index += 1) {
+        const randIndex = RandChar.getRandomInt(records.length);
+        const record = records[randIndex];
+
+        newRecords.push(record);
+      }
+
+      await dataHelper.writeCsvFile(
+        newRecords,
+        'VictoriaD_BenPlanDeps_12082020_1000.csv'
+      );
     });
   }
 
