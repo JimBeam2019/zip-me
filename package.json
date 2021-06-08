@@ -2,13 +2,18 @@
   "name": "zip-me",
   "version": "1.0.0",
   "description": "Zip Me Lab",
+  "engines": {
+    "node": ">=14.15.1"
+  },
   "main": "index.js",
   "repository": "https://github.com/JimBeam2019/zip-me.git",
   "author": "J.L.",
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start": "babel-watch index.js"
+    "start": "babel-watch index.js",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
     "@babel/core": "^7.12.13",
@@ -29,6 +34,13 @@
     "eslint-plugin-prefer-arrow": "^1.2.3",
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-promise": "^4.3.1",
+    "jest": "^27.0.4",
     "prettier": "^2.2.1"
+  },
+  "jest": {
+    "verbose": true,
+    "modulePathIgnorePatterns": [
+      "data"
+    ]
   }
 }

@@ -1,0 +1,11 @@
+{
+  "overrides": [
+    {
+      "files": "**/*.js",
+      "rules": {
+        "node/no-unpublished-require": 0,
+        "newline-per-chained-call": 0
+      }
+    }
+  ]
+}
