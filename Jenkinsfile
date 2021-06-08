@@ -8,6 +8,9 @@ pipeline {
 
       steps {
         echo 'Building the app.'
+        sh 'yarn install'
+        sh 'yarn build'
+        sh 'yarn test'
       }
     }
 
